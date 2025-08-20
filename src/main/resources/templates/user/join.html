@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>join</title>
+</head>
+<body>
+
+    <h1>회원가입</h1>
+    <form th:action="@{/user/join}" method="post" class="join">
+        <label>이름<input type="text" name="userName"></label><hr>
+        <label>생년월일<input type="date" name="userBirthday" value="2000-01-01"></label><hr>
+        <label>아이디<input type="text" name="loginId"></label><hr>
+        <label>비밀번호<input type="password" name="password"></label><hr>
+        <label>비밀번호 확인<input type="password"></label><hr>
+        <label>이메일<input type="text" name="email"></label><hr>
+
+        <button type="submit">가입하기</button>
+
+    </form>
+</body>
+</html>

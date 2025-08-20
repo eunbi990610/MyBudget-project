@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>category</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+        body{
+            display: flex;
+            column-gap: 100px;
+            margin-left: 100px;
+            margin-top: 50px;
+        }
+
+        .budget > *{
+            margin-bottom: 50px;
+        }
+
+    </style>
+</head>
+<body>
+
+<div>
+    <h1>지출 category</h1>
+    <form th:action="@{/category/add}">
+        <label>지출 카테고리 추가하기<input type="text"></label>
+        <button> + </button>
+    </form>
+    <div>expense-category-List</div>
+    <div id="expense-category-list"></div>
+</div>
+
+<div id="calendar">
+
+</div>
+
+<div class="budget">
+
+    <div>
+        <h1><span>month</span>월 수익</h1>
+        <form th:action="@{/income/add}">
+            <label>수익 추가하기<input type="text"></label>
+            <button> + </button>
+        </form>
+        <div>income-list</div>
+
+    </div>
+
+    <div>
+        <h1><span>month</span>월 지출</h1>
+        <form th:action="@{/expense/add}">
+            <label>비용 추가하기<input type="text"></label>
+            <button> + </button>
+        </form>
+        <div>expense-list</div>
+<!--        <div class="expense-list" th:each="expenseList: ${}">-->
+<!--            <span class="expense" th:text="${}"></span>-->
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

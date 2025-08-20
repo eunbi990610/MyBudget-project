@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mybudget.mapper.user.UserMapper">
+
+<!--  회원가입  -->
+    <insert id="insertUser" useGeneratedKeys="true" keyProperty="userId" keyColumn="USER_ID">
+        INSERT INTO TBL_USER(USER_NAME, USER_BIRTHDAY, LOGIN_ID, PASSWORD, email)
+        VALUES(#{userName},#{userBirthday},#{loginId},#{password},#{email})
+    </insert>
+
+<!--회원가입 - 아이디 중복 검사 -->
+    <select id="existsByLoginId" resultType="boolean">
+        select exists(select 1 from TBL_USER where LOGIN_ID = #{loginId})
+    </select>
+
+<!--    로그인 - 아이디 & 비밀번호 일치-->
+    <select id="selectUserId" resultType="long">
+        SELECT USER_ID
+        FROM TBL_USER
+        WHERE LOGIN_ID = #{loginId} AND PASSWORD = #{password}
+    </select>
+
+<!--    로그인 - 로그인 실패 횟수조회(아이디 기준)-->
+    <select id="selectFailedLoginCount" resultType="int">
+        SELECT FAILED_LOGIN_COUNT
+        FROM TBL_USER
+        WHERE LOGIN_ID = #{loginId};
+    </select>
+
+<!--    로그인 - 로그인 실패 시 실패 회수 추가-->
+    <update id="updateFailedLoginCount">
+        UPDATE TBL_USER
+        SET FAILED_LOGIN_COUNT =
+            (SELECT FAILED_LOGIN_COUNT FROM TBL_USER WHERE LOGIN_ID = #{loginId}) + 1
+        WHERE LOGIN_ID = #{loginId}
+    </update>
+
+<!--    아이디/비번 찾기 - 회원이름, 이메일 동일한 회원식별번호, 아이디 조회-->
+    <select id="findLoginId">
+        SELECT USER_ID, LOGIN_ID
+        FROM TBL_USER
+        WHERE USER_NAME = #{userName} AND email = #{email}
+    </select>
+
+<!--    # 아이디/비번 찾기 - 회원이름, 아이디, 이메일 동일한 회원 식별변호 조회-->
+    <select id="selectPassword">
+        SELECT USER_ID, LOGIN_ID, PASSWORD
+        FROM TBL_USER
+        WHERE USER_NAME = #{userName} AND LOGIN_ID = #{loginId} AND email = #{email}
+    </select>
+
+
+<!--    # 아이디/비번 찾기 - 비밀번호 변경-->
+    <update id="updatePassword">
+        UPDATE TBL_USER SET PASSWORD = 'NEW_PASSWORD_TEST'
+        WHERE USER_ID =
+              (SELECT USER_ID FROM TBL_USER
+               WHERE USER_NAME = #{userName} AND LOGIN_ID = #{loginId} AND email = #{email}
+              )
+    </update>
+
+
+
+</mapper>
