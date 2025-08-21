@@ -38,7 +38,7 @@ class budgetServiceTest {
 
         categoryDto = CategoryDTO.builder()
                 .categoryName("<category test>")
-                .userId(6L)
+//                .userId(6L)
                 .categoryType(CategoryType.EXPENSE)
                 .build();
     }
@@ -54,7 +54,7 @@ class budgetServiceTest {
     @Test
     void addCategory() {
 
-        budgetService.addCategory(categoryDto);
+        budgetService.addCategory(categoryDto, 6L);
 
         List<CategoryDTO> allCategories = budgetService.findAllCategories(6L);
         System.out.println("allCategories = " + allCategories);
@@ -62,7 +62,7 @@ class budgetServiceTest {
 
     @Test
     void updateCategoryName(){
-        budgetService.addCategory(categoryDto);
+        budgetService.addCategory(categoryDto, 6L);
 
         List<CategoryDTO> allCategories = budgetService.findAllCategories(6L);
         System.out.println("allCategories = " + allCategories);
@@ -76,10 +76,12 @@ class budgetServiceTest {
 
     @Test
     void deleteCategory(){
-        budgetService.addCategory(categoryDto);
-        budgetService.deleteCategory(categoryDto.getUserId(), categoryDto.getCategoryId());
+        budgetService.addCategory(categoryDto, 6L);
         List<CategoryDTO> allCategories = budgetService.findAllCategories(categoryDto.getUserId());
         System.out.println("allCategories = " + allCategories);
+        budgetService.deleteCategory(categoryDto.getUserId(), categoryDto.getCategoryId());
+        List<CategoryDTO> afterCategories = budgetService.findAllCategories(categoryDto.getUserId());
+        System.out.println("afterCategories = " + afterCategories);
 // 에러 발생
         //sed by: java.sql.SQLException: (conn=40) Lock wait timeout exceeded; try restarting transaction
 

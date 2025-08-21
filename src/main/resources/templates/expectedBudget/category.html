@@ -18,6 +18,13 @@
         .budget > *{
             margin-bottom: 50px;
         }
+        .expense-category{
+            display: flex;
+            justify-content: space-between;
+        }
+        .categoryId{
+            display: none;
+        }
 
     </style>
 </head>
@@ -25,12 +32,18 @@
 
 <div>
     <h1>지출 category</h1>
-    <form th:action="@{/category/add}">
-        <label>지출 카테고리 추가하기<input type="text"></label>
+    <form th:action="@{/expected/add/category}" method="post">
+        <label>지출 카테고리 추가하기<input type="text" name="categoryName"></label>
         <button> + </button>
     </form>
     <div>expense-category-List</div>
-    <div id="expense-category-list"></div>
+    <div id="expense-category-list" th:each="category : ${allCategories}">
+        <div class="expense-category">
+            <span th:text="${category.categoryName}"></span>
+            <span th:text="${category.categoryId}" class="categoryId"></span>
+            <button type="button" class="drop_category-btn">x</button>
+            </div>
+    </div>
 </div>
 
 <div id="calendar">
@@ -63,4 +76,44 @@
 
 </div>
 </body>
+<script>
+    let categories = document.querySelectorAll('.expense-category');
+    categories.forEach(category =>{
+        category.addEventListener('click',()=>{
+            let categoryId = category.querySelector('.categoryId');
+            console.log('id = ' + categoryId.textContent);
+        })
+    });
+
+    let dropCategoryBtns = document.querySelectorAll('.drop_category-btn');
+    dropCategoryBtns.forEach(dropBtn =>{
+        dropBtn.addEventListener('click', function() {
+            const categoryId = this.closest("div").querySelector(".categoryId").innerText;
+            fetch("/budget-api/drop-category", {
+                method : "DELETE",
+                headers : {
+                    "Content-Type": "application/json"
+                },
+                body : JSON.stringify( {
+                    "categoryId" : categoryId
+                })
+            }).then(response => {
+                if(!response.ok){
+                    throw new Error("지출 카테고리 삭제 실패");
+                }
+                if(response.status === 204) {
+                    console.log("지출 category 삭제 성공");
+                    return null;
+                }
+                return response.json();
+            }).then(data => {
+                if(data) console.log("서버 응답 데이터 = ", data);
+            }).catch(error => {
+                console.error("지출 카테고리 삭제 중 에러 발생 :", error);
+            });
+        })
+    })
+
+
+</script>
 </html>

@@ -1,6 +1,7 @@
 package com.example.mybudget.service;
 
 import com.example.mybudget.dto.CategoryDTO;
+import com.example.mybudget.dto.CategoryType;
 import com.example.mybudget.mapper.user.BudgetMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,9 @@ public class BudgetService {
         return budgetMapper.selectAllCategories(userId);
     }
 
-    public void addCategory(CategoryDTO categoryDto){
+    public void addCategory(CategoryDTO categoryDto, Long userId){
+        categoryDto.setUserId(userId);
+        categoryDto.setCategoryType(CategoryType.EXPENSE);
         budgetMapper.insertCategory(categoryDto);
     }
 

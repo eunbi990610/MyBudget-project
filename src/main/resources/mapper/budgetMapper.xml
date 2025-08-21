@@ -6,7 +6,7 @@
     <select id="selectAllCategories">
         select category_id, user_id, category_name, category_type, create_at
         from TBL_CATEGORY
-        where USER_ID = #{userId} and IS_DELETED = 0;
+        where USER_ID = #{userId} and IS_DELETED = 0 and category_type = 'expense';
     </select>
 
 <!--    기본 지출 카테고리 생성 (회원가입 시 실행 )-->
