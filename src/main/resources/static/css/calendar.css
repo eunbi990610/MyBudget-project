@@ -1,0 +1,65 @@
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.calendar{
+    width: 600px;
+    background-color: aquamarine;
+}
+
+
+.calendar-header{
+    width: 100%;
+    display: flex;
+}
+
+.calendar-body{
+    width: 100%;
+}
+.days,
+.dates{
+    display: grid;
+    grid-template-columns: repeat(7,1fr);
+}
+.day,.date {
+    width: 100%;
+    display: flex;
+    align-content: center;
+    justify-content: center;
+}
+
+.date{
+    border: 1px solid;
+    height: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+}
+
+
+/* 특정일의 거래 내역*/
+.transaction-list{
+    width: 700px;
+    border: 1px solid thistle;
+}
+
+.list-header{
+    display: grid;
+    grid-template-columns: 200px 130px 120px 100px 1fr ;
+}
+
+.list-item{
+    display: grid;
+    grid-template-columns: 200px 130px 120px 100px 1fr ;
+}
+
+
+
+.list-header *{
+    border: 1px solid rosybrown;
+}
+
+

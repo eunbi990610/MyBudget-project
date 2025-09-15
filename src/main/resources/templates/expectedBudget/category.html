@@ -8,7 +8,27 @@
             padding: 0;
             margin: 0;
         }
+
         body{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #calendar-navigation-buttons{
+            display: flex;
+            margin: 20px 0;
+            font-size: 30px;
+        }
+        #prev-btn, #next-btn{
+            padding: 0 40px  ;
+        }
+        #month, #year{
+            font-weight: bold;
+        }
+
+
+        #main-container{
             display: flex;
             column-gap: 100px;
             margin-left: 100px;
@@ -18,36 +38,103 @@
         .budget > *{
             margin-bottom: 50px;
         }
-        .expense-category{
+        .expense-category,
+        .paymentMethod{
             display: flex;
             justify-content: space-between;
         }
-        .categoryId{
+
+        .hidden{
             display: none;
         }
 
+        .error-msg{
+            color: red;
+            font-size: 10px;
+        }
+
+        .list-content{
+            display: flex;
+        }
+        .budget-list{
+            display: flex;
+            justify-content: space-between;
+        }
+
+
+
     </style>
+    <script defer th:src="@{/js/Budget.js}"></script>
 </head>
 <body>
+<a th:href="@{/}">메인페이지</a>
+    <div id="calendar-navigation-buttons">
+        <a id="prev-btn" href="#">&lt;</a>
+        <div id="year" th:text="${year}"></div><span>년</span>
+        <div id="month" th:text="${month}"></div><span>월</span>
+        <a id="next-btn" href="#"> &gt;</a>
+    </div>
+
+    <div id="main-container">
+
 
 <div>
     <h1>지출 category</h1>
     <form th:action="@{/expected/add/category}" method="post">
-        <label>지출 카테고리 추가하기<input type="text" name="categoryName"></label>
+        <label>지출 카테고리 추가하기
+            <input type="text" name="categoryName">
+            <input type="text" name="periodId" th:value="${periodId}" style="display: none">
+            <input type="text" name="year"  style="display: none" th:value="${year}">
+            <input type="text" name="month" style="display: none" th:value="${month}">
+        </label>
         <button> + </button>
     </form>
-    <div>expense-category-List</div>
-    <div id="expense-category-list" th:each="category : ${allCategories}">
-        <div class="expense-category">
-            <span th:text="${category.categoryName}"></span>
-            <span th:text="${category.categoryId}" class="categoryId"></span>
-            <button type="button" class="drop_category-btn">x</button>
+    <h3>expense-category-List</h3>
+    <div id="category-lists">
+        <div class="expense-category"
+             th:each="category : ${allCategories}"
+             th:attr="data-id=${category.categoryId}">
+            <div class="category-name"
+                 th:text="${category.categoryName}"></div>
+            <div class="modify_name-input hidden">
+                <label><input name="categoryNewName" type="text" th:value="${category.categoryName}"></label>
+                <span class="error-msg"></span>
             </div>
+            <div class="buttons">
+                <button type="button" class="modify_category-btn">v</button>
+                <button type="button" class="drop_category-btn">x</button>
+                <button type="button" class="modify_finish-btn hidden">수정</button>
+                <button type="button" class="reset-btn hidden">취소</button>
+            </div>
+        </div>
     </div>
 </div>
 
-<div id="calendar">
-
+<div id="payment-method">
+    <h1>지출 수단</h1>
+    <form th:action="@{/expected/add/paymentMethod}" method="post">
+        <label>지출 수단 추가하기 <input type="text" name="paymentMethodName" placeholder="지출수단 이름을 작성해주세요"></label>
+        <input type="text" name="year"  style="display: none" th:value="${year}">
+        <input type="text" name="month" style="display: none" th:value="${month}">
+        <button>+</button>
+    </form>
+    <h3>지출 수단 리스트</h3>
+    <div id="paymentMethod-lists">
+        <div class="paymentMethod" th:each="paymentList: ${allPayment}">
+            <div class="payment-name"
+                 th:text="${paymentList.paymentMethodName}"></div>
+            <div class="modify_name-input hidden">
+                <label><input name="newPaymentMethodName" type="text" th:value="${paymentList.paymentMethodId}"></label>
+                <span class="error-msg"></span>
+            </div>
+            <div class="buttons">
+                <button type="button" class="modify_category-btn">v</button>
+                <button type="button" class="drop_category-btn">x</button>
+                <button type="button" class="modify_finish-btn hidden">수정</button>
+                <button type="button" class="reset-btn hidden">취소</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="budget">
@@ -68,52 +155,38 @@
             <label>비용 추가하기<input type="text"></label>
             <button> + </button>
         </form>
-        <div>expense-list</div>
-<!--        <div class="expense-list" th:each="expenseList: ${}">-->
-<!--            <span class="expense" th:text="${}"></span>-->
+        <h3>budget-list</h3>
+        <div id="budget-lists">
+            <div class="budget-list"
+                 th:each="budgetList: ${allBudgets}"
+                 th:attr="data-id=${budgetList.budgetId}">
+                <div class="list-content">
+                    <span class="budget-name" th:text="${budgetList.categoryName}"></span>
+                    <div class="budget-amount" th:text="${budgetList.budgetAmount}"></div>
+                </div>
+                <div class="modify-input hidden">
+                    <div><label>
+                        <input type="text"
+                               oninput="this.value = this.value
+                                  .replace(/[^0-9]/g, '')
+                                  .replace(/\B(?=(\d{3})+(?!\d))/g, ',')"
+                               name="budget-amount"
+                               th:value="${budgetList.budgetAmount}">
+                    </label></div>
+
+                </div>
+                <div class="buttons">
+                    <button type="button" class="modify-btn">v</button>
+                    <button type="button" class="modify-finish_btn hidden">수정</button>
+                    <button type="button" class="modify-reset_btn hidden">취소</button>
+                </div>
+            </div>
+
         </div>
+        <div id="budget-total">예산 합계 : <span th:text="${budgetAmountSum}"></span></div>
     </div>
 
 </div>
+    </div>
 </body>
-<script>
-    let categories = document.querySelectorAll('.expense-category');
-    categories.forEach(category =>{
-        category.addEventListener('click',()=>{
-            let categoryId = category.querySelector('.categoryId');
-            console.log('id = ' + categoryId.textContent);
-        })
-    });
-
-    let dropCategoryBtns = document.querySelectorAll('.drop_category-btn');
-    dropCategoryBtns.forEach(dropBtn =>{
-        dropBtn.addEventListener('click', function() {
-            const categoryId = this.closest("div").querySelector(".categoryId").innerText;
-            fetch("/budget-api/drop-category", {
-                method : "DELETE",
-                headers : {
-                    "Content-Type": "application/json"
-                },
-                body : JSON.stringify( {
-                    "categoryId" : categoryId
-                })
-            }).then(response => {
-                if(!response.ok){
-                    throw new Error("지출 카테고리 삭제 실패");
-                }
-                if(response.status === 204) {
-                    console.log("지출 category 삭제 성공");
-                    return null;
-                }
-                return response.json();
-            }).then(data => {
-                if(data) console.log("서버 응답 데이터 = ", data);
-            }).catch(error => {
-                console.error("지출 카테고리 삭제 중 에러 발생 :", error);
-            });
-        })
-    })
-
-
-</script>
 </html>

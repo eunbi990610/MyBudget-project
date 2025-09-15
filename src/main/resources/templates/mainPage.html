@@ -7,13 +7,20 @@
 <body>
 
 <div class="header">
-    <a th:href="@{/expected/budget}">예산 등록하기</a>
+    <a id="budget" href="#" >예산 등록하기</a>
     <a th:href="@{/user/logout}">logout</a>
+    <a id="transection" th:href="@{/transactions/daily}">가계부</a>
 </div>
 
 
 </body>
 <script>
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth() + 1;
 
+    document.querySelector('#budget').href = `/expected/budget?year=${year}&month=${month}`;
+    document.querySelector('#transection').href = `transactions/daily?year=${year}&month=${month}`
+//th:href="@{/expected/budget/}"
 </script>
 </html>

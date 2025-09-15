@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mybudget.mapper.user.PeriodMapper">
+
+<select id="selectPeriodId">
+    select PERIOD_ID
+    from TBL_PERIOD
+    where YEAR = #{year} and MONTH = #{month}
+</select>
+
+<insert id="insertPeriod" useGeneratedKeys="true">
+    insert into TBL_PERIOD (YEAR, MONTH) VALUES (#{year},#{month})
+</insert>
+
+    <!--    회원/기간별 집계 데이터 insert or update   -->
+    <insert id="insertAggregate" useGeneratedKeys="true">
+        insert into TBL_PERIOD_AGGREGATE(user_id, period_id)
+        VALUES(#{userId},#{periodId})
+    </insert>
+
+    <select id="selectExistAggregateId">
+        select count(AGGREGATE_ID)
+        from TBL_PERIOD_AGGREGATE
+        where USER_ID = #{userId} and PERIOD_ID = #{periodId}
+    </select>
+
+    <update id="updateIncomeSum">
+        update TBL_PERIOD_AGGREGATE
+        set INCOME_SUM = (select INCOME_SUM
+                          from TBL_PERIOD_AGGREGATE
+                          where USER_ID = #{userId} and PERIOD_ID = #{periodId}) + #{additionalIncome}
+        where USER_ID = #{userId} and PERIOD_ID = #{periodId}
+    </update>
+
+    <update id="updatePlannedExpenseSum">
+        update TBL_PERIOD_AGGREGATE
+        set PLANNED_EXPENSE_SUM =
+                (select PLANNED_EXPENSE_SUM
+                 from TBL_PERIOD_AGGREGATE
+                 where USER_ID = #{userId}
+                   and PERIOD_ID = #{periodId})
+                    - #{oldBudgetAmount}
+                    + #{newBudgetAmount}
+        where USER_ID = #{userId} and PERIOD_ID = #{periodId}
+    </update>
+
+
+    <select id="selectAvailableAmount">
+        select AVAILABLE_AMOUNT
+        from TBL_PERIOD_AGGREGATE
+        where USER_ID = #{userId} and PERIOD_ID =#{periodId}
+    </select>
+
+    <select id="selectAggregateList">
+        select aggregate_id, user_id, period_id, income_sum, planned_expense_sum, actual_expense_sum, available_amount, update_at
+        from TBL_PERIOD_AGGREGATE
+        where USER_ID = #{userId} and PERIOD_ID =#{periodId}
+    </select>
+
+
+
+
+
+
+
+
+
+
+
+</mapper>

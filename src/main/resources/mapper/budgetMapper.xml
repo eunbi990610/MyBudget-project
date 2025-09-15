@@ -6,7 +6,8 @@
     <select id="selectAllCategories">
         select category_id, user_id, category_name, category_type, create_at
         from TBL_CATEGORY
-        where USER_ID = #{userId} and IS_DELETED = 0 and category_type = 'expense';
+        where USER_ID = #{userId} and IS_DELETED = 0 and category_type = 'expense'
+        order by CATEGORY_ID
     </select>
 
 <!--    기본 지출 카테고리 생성 (회원가입 시 실행 )-->
@@ -30,6 +31,13 @@
         where USER_ID = #{userId} and CATEGORY_ID = #{categoryId}
     </update>
 
+<!--카테고리 이름 중복 확인-->
+    <select id="checkCategoryName">
+        select count(CATEGORY_NAME)
+        from TBL_CATEGORY
+        where CATEGORY_NAME = #{categoryName} and IS_DELETED = 0 and USER_ID= #{userId}
+    </select>
+
 
 <!--  카테고리 소트프 삭제   -->
     <update id="softDeleteCategory">
@@ -38,8 +46,62 @@
     </update>
 
 
-<!--    -->
+<!--특정 달 수익 리스트-->
 
+<!--특정 달 수익 추가-->
+<!--특정 달 수익 수정-->
+<!--특정 달 수익 삭제-->
+
+<!--특정 달 예상 지출 리스트-->
+    <select id="selectAllBudgetList">
+        select budget_id, b.user_id, b.category_id, b.category_type, period_id, budget_amount,category_name
+        from TBL_BUDGET B join TBL_CATEGORY C
+                               on b.CATEGORY_ID = c.CATEGORY_ID
+        where b.USER_ID=#{userId} and b.CATEGORY_TYPE = 'expense' and PERIOD_ID = #{periodId}
+        order by b.category_id
+    </select>
+
+
+<!--특정 달 예상 지출 추가-->
+    <insert id="insertBudget" useGeneratedKeys="true">
+        insert into TBL_BUDGET(user_id, category_id, category_type, period_id)
+        VALUES (#{userId}, #{categoryId}, 'expense', #{periodId})
+    </insert>
+
+    <insert id="insertBudgetList">
+        insert into TBL_BUDGET (USER_ID, CATEGORY_ID, CATEGORY_TYPE, PERIOD_ID,BUDGET_AMOUNT )
+        select #{userId}, c.CATEGORY_ID,c.CATEGORY_TYPE, #{periodId}, 0
+        from TBL_CATEGORY c
+        where c.USER_ID=#{userId} and c.IS_DELETED = 0 and c.CATEGORY_TYPE = 'EXPENSE'
+          and not exists(
+            select 1
+            from TBL_BUDGET b
+            where b.USER_ID = #{userId} and b.PERIOD_ID = #{periodId} and b.CATEGORY_ID = c.CATEGORY_ID
+        )
+    </insert>
+<!--특정 달 예상 지출 수정-->
+    <update id="updateBudgetAmount">
+        update TBL_BUDGET
+        set BUDGET_AMOUNT = #{budgetAmount}
+        where BUDGET_ID = #{budgetId};
+    </update>
+<!--특정 달 예상 지출 삭제-->
+    <delete id="deleteBudget">
+        delete from TBL_BUDGET where USER_ID = #{userId} and CATEGORY_ID =#{categoryId}
+    </delete>
+
+
+    <select id="selectBudgetRefByBudgetId">
+        select USER_ID, PERIOD_ID, BUDGET_AMOUNT
+        from TBL_BUDGET
+        where BUDGET_ID = #{budgetId}
+    </select>
+
+    <select id="selectBudgetAmountSum">
+        SELECT COALESCE(SUM(BUDGET_AMOUNT), 0) AS TOTAL_BUDGET
+        FROM TBL_BUDGET
+        WHERE USER_ID = #{userId} AND PERIOD_ID = #{periodId}
+    </select>
 
 
 

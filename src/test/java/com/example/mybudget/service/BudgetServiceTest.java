@@ -1,9 +1,7 @@
 package com.example.mybudget.service;
 
-import com.example.mybudget.dto.CategoryDTO;
-import com.example.mybudget.dto.CategoryType;
-import com.example.mybudget.dto.UserDTO;
-import org.assertj.core.api.Assertions;
+import com.example.mybudget.dto.*;
+import com.example.mybudget.mapper.user.PeriodMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,11 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @SpringBootTest
 @Transactional
-class budgetServiceTest {
+class BudgetServiceTest {
 
     UserDTO userDto;
     CategoryDTO categoryDto;
@@ -25,6 +21,8 @@ class budgetServiceTest {
     UserService userService;
     @Autowired
     BudgetService budgetService;
+    @Autowired
+    private PeriodMapper periodMapper;
 
     @BeforeEach
     void setUp() {
@@ -54,7 +52,7 @@ class budgetServiceTest {
     @Test
     void addCategory() {
 
-        budgetService.addCategory(categoryDto, 6L);
+        budgetService.addCategory(categoryDto,1L, 6L);
 
         List<CategoryDTO> allCategories = budgetService.findAllCategories(6L);
         System.out.println("allCategories = " + allCategories);
@@ -62,7 +60,7 @@ class budgetServiceTest {
 
     @Test
     void updateCategoryName(){
-        budgetService.addCategory(categoryDto, 6L);
+        budgetService.addCategory(categoryDto, 1L,6L);
 
         List<CategoryDTO> allCategories = budgetService.findAllCategories(6L);
         System.out.println("allCategories = " + allCategories);
@@ -76,7 +74,7 @@ class budgetServiceTest {
 
     @Test
     void deleteCategory(){
-        budgetService.addCategory(categoryDto, 6L);
+        budgetService.addCategory(categoryDto,1L, 6L);
         List<CategoryDTO> allCategories = budgetService.findAllCategories(categoryDto.getUserId());
         System.out.println("allCategories = " + allCategories);
         budgetService.deleteCategory(categoryDto.getUserId(), categoryDto.getCategoryId());
@@ -87,5 +85,37 @@ class budgetServiceTest {
 
 
     }
+
+    @Test
+    void changeCategoryName(){
+        List<BudgetListDTO> allBudgets = budgetService.findAllBudgets(1L, 1L);
+        System.out.println("allBudgets = " + allBudgets.toString());
+        budgetService.changeBudgetAmount(6L,1000000);
+        List<BudgetListDTO> afterBudgets = budgetService.findAllBudgets(1L, 1L);
+        System.out.println("afterBudgets = " + afterBudgets);
+    }
+
+    @Test
+    void deleteBudget(){
+        List<BudgetListDTO> allBudgets = budgetService.findAllBudgets(1L, 1L);
+        System.out.println("allBudgets = " + allBudgets.toString());
+//        budgetService.deleteBudget(6L);
+        List<BudgetListDTO> afterBudgets = budgetService.findAllBudgets(1L, 1L);
+        System.out.println("afterBudgets = " + afterBudgets);
+    }
+
+    @Test
+    void changeBudgetAmount(){
+
+        budgetService.changeBudgetAmount(6L,1000000);
+
+        List<BudgetListDTO> allBudgets = budgetService.findAllBudgets(1L, 1L);
+        System.out.println("allBudgets = " + allBudgets.toString());
+
+        List<AggregateBudgetListDTO> aggregateBudgetListDTOS = periodMapper.selectAggregateList(1L, 1L);
+        System.out.println("aggregateBudgetListDTOS = " + aggregateBudgetListDTOS.toString());
+
+    }
+
 
 }

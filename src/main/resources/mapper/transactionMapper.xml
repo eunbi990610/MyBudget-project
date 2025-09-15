@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mybudget.mapper.TransactionMapper">
+
+<!--거래 등록-->
+    <insert id="insertTransaction" useGeneratedKeys="true">
+        insert into TBL_TRANSACTION (USER_ID, CATEGORY_ID, PAYMENT_METHOD_ID, PERIOD_ID, TRANSACTION_DATE, TRANSACTION_AMOUNT, TRANSACTION_TYPE, TRANSACTION_TITLE,MEMO)
+        VALUES (#{userId}, #{categoryId}, #{paymentMethodId}, #{periodId},#{transactionDate},#{transactionAmount},#{transactionType},#{transactionTitle},#{memo})
+    </insert>
+
+<!--거래 리스트 조회-->
+    <select id="selectAllTransactions">
+        select transaction_id, user_id, category_id, payment_method_id, period_id, transaction_date, transaction_amount, transaction_type, transaction_title, create_at, memo
+        from TBL_TRANSACTION
+        where USER_ID = #{userId} and PERIOD_ID = #{periodId}
+    </select>
+
+<!--거래 삭제-->
+    <delete id="deleteTransaction">
+        delete from TBL_TRANSACTION
+        where TRANSACTION_ID = #{transactionId}
+    </delete>
+
+
+<!--각 일별 지출합계액-->
+    <select id="selectSumDailyExpense" resultType="map">
+        <![CDATA[
+            select n.n as day, coalesce(s.sum, 0) as sum
+            from T_NUMBERS n left join (
+                select day(t.TRANSACTION_DATE) as day,
+                sum(t.TRANSACTION_AMOUNT) as sum
+                from TBL_TRANSACTION t
+                where t.USER_ID = #{userId}
+                and t.TRANSACTION_TYPE = 'EXPENSE'
+                and t.TRANSACTION_DATE >= DATE (#{startOfMonth})
+                and t.TRANSACTION_DATE < DATE_ADD(DATE(#{startOfMonth}), INTERVAL 1 MONTH )
+                group by day(t.TRANSACTION_DATE)
+            ) s on s.day = n.n
+            where n.n <= day(last_day(date(#{startOfMonth})))
+            order by n.n
+        ]]>
+    </select>
+
+
+<!--특정 일의 거래 내역-->
+    <select id="selectTransactionList" resultType="com.example.mybudget.dto.TransactionDTO">
+        select total.user_id, total.payment_method_name, total.transaction_id, total.category_id, total.period_id, total.transaction_date, total.transaction_amount, total.transaction_type, total.transaction_title, total.create_at, total.memo, total.payment_method_id, c.CATEGORY_NAME
+        from
+            (select t.payment_method_id, t.user_id, payment_method_name, transaction_id, category_id, period_id, transaction_date, transaction_amount, transaction_type, transaction_title, retrieve_status, t.create_at, memo
+             from TBL_PAYMENT_METHOD p join TBL_TRANSACTION t
+                                            on p.PAYMENT_METHOD_ID = t.PAYMENT_METHOD_ID
+             where p.USER_ID = #{userId}) total left join TBL_CATEGORY c
+                                                  on total.CATEGORY_ID = c.CATEGORY_ID
+        where TRANSACTION_DATE = #{transactionDate}
+    </select>
+
+<!--월 지출/수익 합계-->
+    <select id="selectTotalMonthlyAmount" resultType="int">
+        select coalesce(sum(TBL_TRANSACTION.TRANSACTION_AMOUNT), 0) as totalAmount
+        from TBL_TRANSACTION
+        where USER_ID = #{userId}
+          and PERIOD_ID = #{periodId}
+          and TRANSACTION_TYPE = #{transactionType}
+    </select>
+    
+    
+</mapper>

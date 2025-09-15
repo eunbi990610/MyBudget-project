@@ -13,7 +13,7 @@ import java.util.List;
 
 @SpringBootTest
 @Transactional
-class budgetMapperTest {
+class BudgetMapperTest {
 
     @Autowired
     private BudgetMapper budgetMapper;
@@ -87,6 +87,12 @@ class budgetMapperTest {
         List<CategoryDTO> categoryDTOS = budgetMapper.selectAllCategories(6L);
         System.out.println("categoryDTOS = " + categoryDTOS.toString());
 
+    }
+
+    @Test
+    void checkCategoryName() {
+        boolean test = budgetMapper.checkCategoryName(1L,"test3");
+        System.out.println("test = " + test);
 
     }
 }
